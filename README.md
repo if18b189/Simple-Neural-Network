@@ -22,11 +22,11 @@ Image from the dataset(with resolution)
 
 ## Setup & Installation
 
-to be continued ... 
+/
 
 ## Usage & Details
 
-to be continued ... 
+/
 
 ## Roadmap:
 - [ ] save function, to save trained models
