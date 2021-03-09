@@ -232,6 +232,7 @@ train_x, train_y, test_x, test_y = load_data()
 
 cost, acc, y_pred = runModel(train_x, train_y, test_x, test_y)
 
+# visualizing results
 x_a = [i for i in range(acc.shape[0])]
 x_c = [i for i in range(len(cost))]
 print('final prediction accuracy is: ', acc[9])  # length of acc arr must be epochs -1
@@ -258,6 +259,9 @@ ax[0].set_yticks([])
 plt.tight_layout()
 plt.show()
 
+
+visualize_sigmoid()
+
 # additional user code
 
 f = open('mnist database of handwritten digits\\t10k-images.idx3-ubyte', 'rb')
@@ -271,4 +275,4 @@ data = data.reshape(num_images, image_size, image_size, 1)
 
 image = np.asarray(data[1]).squeeze()
 plt.imshow(image)
-plt.show()
+plt.show()  # showing single image from dataset
