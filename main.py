@@ -276,3 +276,6 @@ data = data.reshape(num_images, image_size, image_size, 1)
 image = np.asarray(data[1]).squeeze()
 plt.imshow(image)
 plt.show()  # showing single image from dataset
+
+
+# TODO: save and load models
