@@ -4,6 +4,7 @@
 import struct
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 
 from scipy.special import expit
 
@@ -167,7 +168,30 @@ def calc_grad(a1, a2, a3, a4, z2, z3, z4, y_enc, w1, w2, w3):
     return grad1, grad2, grad3
 
 
-def runModel(x, y, x_t, y_t):
+def save_model(model, modelname):
+    pickle.dump(model, open(modelname, 'wb'))
+
+
+def load_model(modelname):
+    weights = pickle.load(open(modelname, 'rb'))
+
+    objects = []
+    with (open(modelname, "rb")) as openfile:
+        while True:
+            try:
+                objects.append(pickle.load(openfile))
+            except EOFError:
+                break
+
+    print(len(objects[0]))
+    print(objects[0])
+
+    # return
+
+    return weights
+
+
+def run_model(x, y, x_t, y_t, modelname=None):
     # x, y, x_t, y_t are the datasets ... _t being test datasets
 
     x_copy, y_copy = x.copy(), y.copy()
@@ -178,9 +202,22 @@ def runModel(x, y, x_t, y_t):
     batch = 50
     # batch ... smaller number of data so we dont run through all the data, which would take a long time
 
-    w1, w2, w3 = init_weights(784, 75, 10)
+    iterations_prev = 0
 
-    alpha = 0.001  # 10 ^ -3
+    # loading model, if possible
+    try:
+
+        iterations_prev, w1, w2, w3 = load_model(modelname)
+
+        print("loading new model with " + str(iterations_prev) + " epochs")
+
+    except FileNotFoundError:
+
+        w1, w2, w3 = init_weights(784, 75, 10)
+
+        print("no model was loaded, training new model from scratch")
+
+    alpha = 0.001  # 10 ^ -3   original value: 0.001
     # learning rate, typical value; determines how large of a step we take in the parameter space
     eta = 0.001
     #
@@ -220,17 +257,29 @@ def runModel(x, y, x_t, y_t):
 
             delta_w1_prev, delta_w2_prev, delta_w3_prev = delta_w1, delta_w2, delta_w3_prev
 
+            # print(delta_w1.shape)
+
         y_pred = predict(x_t, w1, w2, w3)
         pred_acc[i] = 100 * np.sum(y_t == y_pred, axis=0) / x_t.shape[0]
 
-        print('epoch #', i)
+        iterations = i + iterations_prev
+        print('epoch #', iterations)
+
+        # auto saving model
+        # if i != 0 and i % 5 == 0:
+        #     print("saving model epoch: " + str(iterations))
+        #     model = [iterations, w1, w2, w3]
+        #     save_model(model, modelname)
+        if i == epochs - 1:
+            model = [iterations, w1, w2, w3]
+            save_model(model, modelname)
 
     return total_cost, pred_acc, y_pred
 
 
 train_x, train_y, test_x, test_y = load_data()
 
-cost, acc, y_pred = runModel(train_x, train_y, test_x, test_y)
+cost, acc, y_pred = run_model(train_x, train_y, test_x, test_y, "model.pkl")
 
 # visualizing results
 x_a = [i for i in range(acc.shape[0])]
@@ -259,8 +308,7 @@ ax[0].set_yticks([])
 plt.tight_layout()
 plt.show()
 
-
-visualize_sigmoid()
+# visualize_sigmoid()
 
 # additional user code
 
@@ -275,7 +323,6 @@ data = data.reshape(num_images, image_size, image_size, 1)
 
 image = np.asarray(data[1]).squeeze()
 plt.imshow(image)
-plt.show()  # showing single image from dataset
-
+# plt.show()  # showing single image from dataset
 
 # TODO: save and load models
