@@ -168,6 +168,8 @@ def calc_grad(a1, a2, a3, a4, z2, z3, z4, y_enc, w1, w2, w3):
     return grad1, grad2, grad3
 
 
+# TODO: load save bias aswell?
+
 def save_model(model, modelname):
     pickle.dump(model, open(modelname, 'wb'))
 
@@ -196,7 +198,7 @@ def run_model(x, y, x_t, y_t, modelname=None):
 
     x_copy, y_copy = x.copy(), y.copy()
     y_enc = enc_one_hot(y)
-    epochs = 10
+    epochs = 30
     # epoch ... how many times do we train the model, iterations
     # (generally more -> better; too much could lead to overfitting)
     batch = 50
@@ -324,5 +326,3 @@ data = data.reshape(num_images, image_size, image_size, 1)
 image = np.asarray(data[1]).squeeze()
 plt.imshow(image)
 # plt.show()  # showing single image from dataset
-
-# TODO: save and load models
